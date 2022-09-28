@@ -7,6 +7,7 @@ from mgr import ClientManager
 from down import get_local_path
 from exception import MediaNotExistsError, ClientNotExists
 import models
+import decode_wximg
 import ntchat
 
 
@@ -220,6 +221,17 @@ async def send_link_card(model: models.SendLinkCardReqModel):
 @catch_exception()
 async def send_image(model: models.SendMediaReqModel):
     file_path = get_local_path(model)
+    if file_path is None:
+        raise MediaNotExistsError()
+    ret = client_mgr.get_client(model.guid).send_image(model.to_wxid, file_path)
+    return response_json(1 if ret else 0)
+
+
+@app.post("/msg/send_dat_image", summary="将图片dat解密并发送", tags=["Msg"], response_model=models.ResponseModel)
+@catch_exception()
+async def send_dat_image(model: models.SendMediaReqModel):
+    # 路径是图片message里给的
+    file_path = decode_wximg.decode_dat(model.file_path)
     if file_path is None:
         raise MediaNotExistsError()
     ret = client_mgr.get_client(model.guid).send_image(model.to_wxid, file_path)
