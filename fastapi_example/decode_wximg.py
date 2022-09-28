@@ -26,7 +26,7 @@ def get_code(file_path):
         head_index = head_index + 1
         if idf_code == pic_heads[head_index]:
             dat_file.close()
-            return pic_exts[head_index], code
+            return pic_exts[head_index // 2], code
         head_index = head_index + 1
 
     print("not jpg, png, gif")
